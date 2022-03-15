@@ -25,6 +25,7 @@ namespace Coordinate_Input_Interface
             string list_of_FieldID = FieldCoordID.Text;
             string list_of_FieldX = X_FieldValue.Text;
             string list_of_FieldY = Y_FieldValue.Text;
+            string list_of_OrchardID = OrchardCoordID.Text;
             string list_of_OrchardX = X_OrchardValue.Text;
             string list_of_OrchardY = Y_OrchardValue.Text;
             char[] seperator = { ',' };
@@ -35,12 +36,14 @@ namespace Coordinate_Input_Interface
             string[] strarrFieldID = null;
             string[] strarrFieldX = null;
             string[] strarrFieldY = null;
+            string[] strarrOrchardID = null;
             string[] strarrOrchardX = null;
             string[] strarrOrchardY = null;
 
             strarrFieldID = list_of_FieldID.Split(seperator);
             strarrFieldX = list_of_FieldX.Split(seperator);
             strarrFieldY = list_of_FieldY.Split(seperator);
+            strarrOrchardID = list_of_OrchardID.Split(seperator);
             strarrOrchardX = list_of_OrchardX.Split(seperator);
             strarrOrchardY = list_of_OrchardY.Split(seperator);
 
@@ -75,7 +78,8 @@ namespace Coordinate_Input_Interface
                 FieldCoordID.Focus();
             }
 
-            if (int.Equals(list_of_OrchardX.Length, 0) && int.Equals(list_of_OrchardY.Length, 0))
+
+            if (int.Equals(list_of_OrchardID.Length, 0) && int.Equals(list_of_OrchardX.Length, 0) && int.Equals(list_of_OrchardY.Length, 0))
             {
                 if (Orchard_coordinates.Items.Count == 0)
                 {
@@ -83,7 +87,7 @@ namespace Coordinate_Input_Interface
                 }
                
             }
-            else if(int.Equals(strarrOrchardX.Length, strarrOrchardY.Length))
+            else if(int.Equals(strarrOrchardID.Length, strarrOrchardX.Length) && int.Equals(strarrOrchardID.Length, strarrOrchardY.Length) && int.Equals(strarrOrchardX.Length, strarrOrchardY.Length))
             {
                 if (string.IsNullOrEmpty(NumberOfRows.Text))
                 {
@@ -94,15 +98,16 @@ namespace Coordinate_Input_Interface
                 {
                     lblOrchardRows.Text = "Uneseni broj redova je:";
                     NumberOfRows.Text = NumberOfRows.Text;
-                    int FieldOrchardlenght = strarrOrchardX.Length;
+                    int FieldOrchardlenght = strarrOrchardID.Length;
                     for (coordOrchardCnt = 0; coordOrchardCnt < FieldOrchardlenght; coordOrchardCnt++)
                     {
-                        ListViewItem newOrchardCoordinate = new ListViewItem(strarrOrchardX[coordOrchardCnt]);
+                        ListViewItem newOrchardCoordinate = new ListViewItem(strarrOrchardID[coordOrchardCnt]);
+                        newOrchardCoordinate.SubItems.Add(strarrOrchardX[coordOrchardCnt]);
                         newOrchardCoordinate.SubItems.Add(strarrOrchardY[coordOrchardCnt]);
                         Orchard_coordinates.Items.Add(newOrchardCoordinate);
                     }
 
-                    
+                    OrchardCoordID.Clear();
                     X_OrchardValue.Clear();
                     Y_OrchardValue.Clear();
                     X_OrchardValue.Focus();
@@ -112,20 +117,16 @@ namespace Coordinate_Input_Interface
             else
             {
                 MessageBox.Show("You must enter the same number of values!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                X_OrchardValue.Focus();
+                OrchardCoordID.Focus();
             }
         }
 
         private void btnRemoveFieldCoord_Click(object sender, EventArgs e)
         {
-            
-            if (Field_coordinates.Items.Count > 0)
+            foreach(ListViewItem item in Field_coordinates.SelectedItems)
             {
-                Field_coordinates.Items.RemoveAt(Field_coordinates.SelectedIndices[0]);
-                
+                Field_coordinates.Items.Remove(item);
             }
-            
-
         }
 
         private void btnCreate_Click(object sender, EventArgs e)
@@ -139,12 +140,13 @@ namespace Coordinate_Input_Interface
                     Workbook wb = app.Workbooks.Add(XlSheetType.xlWorksheet);
                     Worksheet ws = (Worksheet)app.ActiveSheet;
                     app.Visible = false;
-                    ws.Cells[1, 1] = "Oznaka";
+                    ws.Cells[1, 1] = "Oznake polja";
                     ws.Cells[2, 1] = "Koordinate polja X";
                     ws.Cells[3, 1] = "Koordinate polja Y";
                     ws.Cells[4, 1] = "Broj redova";
-                    ws.Cells[5, 1] = "Koordinate vocnjaka X";
-                    ws.Cells[6, 1] = "Koordinate vocnjaka Y";
+                    ws.Cells[5, 1] = "Oznake vocnjaka";
+                    ws.Cells[6, 1] = "Koordinate vocnjaka X";
+                    ws.Cells[7, 1] = "Koordinate vocnjaka Y";
                     int i = 2;
                     int j = 2;
                     foreach (ListViewItem item in Field_coordinates.Items)
@@ -159,6 +161,7 @@ namespace Coordinate_Input_Interface
                     {
                         ws.Cells[5, j] = item.SubItems[0].Text;
                         ws.Cells[6, j] = item.SubItems[1].Text;
+                        ws.Cells[7, j] = item.SubItems[2].Text;
                         j++;
                     }
                     wb.SaveAs(sfd.FileName, XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
@@ -171,10 +174,9 @@ namespace Coordinate_Input_Interface
 
         private void btnRemoveOrchardCoord_Click(object sender, EventArgs e)
         {
-            if (Orchard_coordinates.Items.Count > 0)
+            foreach (ListViewItem item in Orchard_coordinates.SelectedItems)
             {
-                Orchard_coordinates.Items.RemoveAt(Orchard_coordinates.SelectedIndices[0]);
-
+                Orchard_coordinates.Items.Remove(item);
             }
         }
     }
